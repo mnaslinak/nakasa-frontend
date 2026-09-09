@@ -26,6 +26,71 @@ export default function LoginPage() {
     const [rememberMe, setRememberMe] = useState(false);
 
 
+    // Handle input changes
+    function handleChange(e) {
+
+        const { name, value } = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+
+        setError("");
+    }
+
+
+    // Form submit
+    async function handleSubmit(e) {
+
+        e.preventDefault();
+
+        setError("");
+
+        try {
+
+            setLoading(true);
+
+            /*
+                Later we will connect this to our backend:
+
+                const response = await api.post(
+                    "/users/login",
+                    formData
+                );
+
+                const token = response.data.token;
+
+                localStorage.setItem("token", token);
+
+                navigate("/");
+            */
+
+            console.log("Login data:", formData);
+            console.log("Remember me:", rememberMe);
+
+
+            // Temporary simulation
+            await new Promise(
+                resolve => setTimeout(resolve, 1000)
+            );
+
+            navigate("/");
+
+        } catch (err) {
+
+            setError(
+                err.response?.data?.message ||
+                "Login failed. Please check your email and password."
+            );
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    }
+
 
     return (
 
@@ -54,6 +119,9 @@ export default function LoginPage() {
 
                 </div>
 
+
+                {/* Google Login */}
+                <GoogleAuthButton />
 
 
                 {/* Divider */}
@@ -89,7 +157,7 @@ export default function LoginPage() {
 
                 {/* Login Form */}
                 <form
-               
+                    onSubmit={handleSubmit}
                     className="space-y-5"
                 >
 
@@ -104,7 +172,8 @@ export default function LoginPage() {
                         <input
                             type="email"
                             name="email"
-                           
+                            value={formData.email}
+                            onChange={handleChange}
                             required
                             placeholder="Enter your email"
                             className="w-full border border-gray-300

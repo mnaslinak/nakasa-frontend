@@ -31,6 +31,85 @@ export default function RegisterPage() {
     const [agreeTerms, setAgreeTerms] = useState(false);
 
 
+    // Handle input changes
+    function handleChange(e) {
+
+        const { name, value } = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+
+        setError("");
+    }
+
+
+    // Form submit
+    async function handleSubmit(e) {
+
+        e.preventDefault();
+
+        setError("");
+
+
+        // Check terms
+        if (!agreeTerms) {
+            setError("Please agree to the Terms & Conditions.");
+            return;
+        }
+
+
+        // Check password
+        if (formData.password.length < 8) {
+            setError("Password must contain at least 8 characters.");
+            return;
+        }
+
+
+        // Check confirm password
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
+
+        try {
+
+            setLoading(true);
+
+            /*
+                Later we will connect this to your backend:
+
+                const response = await api.post("/users/register", formData);
+
+                Then:
+                navigate("/login");
+            */
+
+
+            console.log("Register data:", formData);
+
+            // Temporary simulation
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            navigate("/login");
+
+        } catch (err) {
+
+            setError(
+                err.response?.data?.message ||
+                "Registration failed. Please try again."
+            );
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    }
+
+
     return (
         <div className="min-h-screen bg-[#f8f8f8]
                         flex items-center justify-center
@@ -56,6 +135,10 @@ export default function RegisterPage() {
                     </p>
 
                 </div>
+
+
+                {/* Google Registration */}
+                <GoogleAuthButton />
 
 
                 {/* Divider */}
@@ -87,7 +170,7 @@ export default function RegisterPage() {
 
                 {/* Register Form */}
                 <form
-                    
+                    onSubmit={handleSubmit}
                     className="space-y-5"
                 >
 
@@ -103,7 +186,9 @@ export default function RegisterPage() {
                             <input
                                 type="text"
                                 name="firstName"
-                               
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                required
                                 placeholder="First name"
                                 className="w-full border border-gray-300
                                            rounded-lg px-4 py-3
@@ -121,7 +206,8 @@ export default function RegisterPage() {
                             <input
                                 type="text"
                                 name="lastName"
-        
+                                value={formData.lastName}
+                                onChange={handleChange}
                                 required
                                 placeholder="Last name"
                                 className="w-full border border-gray-300
@@ -144,7 +230,8 @@ export default function RegisterPage() {
                         <input
                             type="email"
                             name="email"
-                            
+                            value={formData.email}
+                            onChange={handleChange}
                             required
                             placeholder="Enter your email"
                             className="w-full border border-gray-300
@@ -166,7 +253,9 @@ export default function RegisterPage() {
                         <input
                             type="tel"
                             name="phone"
-                            
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
                             placeholder="07XXXXXXXX"
                             className="w-full border border-gray-300
                                        rounded-lg px-4 py-3
@@ -189,7 +278,9 @@ export default function RegisterPage() {
                             <input
                                 type={showPassword ? "text" : "password"}
                                 name="password"
-                             
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
                                 minLength={8}
                                 placeholder="Minimum 8 characters"
                                 className="w-full border border-gray-300
@@ -234,7 +325,9 @@ export default function RegisterPage() {
                                         : "password"
                                 }
                                 name="confirmPassword"
-                               
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
                                 placeholder="Confirm your password"
                                 className="w-full border border-gray-300
                                            rounded-lg px-4 py-3 pr-12
@@ -244,7 +337,9 @@ export default function RegisterPage() {
 
                             <button
                                 type="button"
-                                
+                                onClick={() =>
+                                    setShowConfirmPassword(
+                                        !showConfirmPassword
                                     )
                                 }
                                 className="absolute right-4 top-1/2
