@@ -1,400 +1,423 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getCart } from "../utils/cartUtils";
+import { useNavigate, useParams } from "react-router-dom";
 
-import {
-    IoSearchOutline,
-    IoPersonOutline,
-    IoBagOutline,
-    IoMenuOutline,
-    IoCloseOutline
-} from "react-icons/io5";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-export default function Header() {
+const EditProductPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(0);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    price: "",
+    oldPrice: "",
+    category: "",
+    brand: "",
+    gender: "",
+    featured: false,
+    discount: "",
+    rating: "",
+  });
 
-    const updateCartCount = () => {
-        const cart = getCart();
+  const [currentImage, setCurrentImage] = useState("");
+  const [newImage, setNewImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-        const totalItems = cart.reduce(
-            (total, item) => total + item.quantity,
-            0
+  // ==========================================
+  // GET PRODUCT
+  // ==========================================
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/products/${id}`
         );
 
-        setCartCount(totalItems);
+        const data = await response.json();
+
+        if (response.ok) {
+          setFormData({
+            name: data.name || "",
+            description: data.description || "",
+            price: data.price || "",
+            oldPrice: data.oldPrice || "",
+            category: data.category || "",
+            brand: data.brand || "",
+            gender: data.gender || "",
+            featured: Boolean(data.featured),
+            discount: data.discount ?? "",
+            rating: data.rating ?? "",
+          });
+
+          setCurrentImage(data.image || "");
+        } else {
+          alert(data.message || "Product not found");
+        }
+      } catch (error) {
+        console.error("Fetch product error:", error);
+        alert("Failed to load product");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    useEffect(() => {
-        updateCartCount();
+    fetchProduct();
+  }, [id]);
 
-        window.addEventListener("cartUpdated", updateCartCount);
+  // ==========================================
+  // HANDLE INPUT CHANGE
+  // ==========================================
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
 
-        return () => {
-            window.removeEventListener("cartUpdated", updateCartCount);
-        };
-    }, []);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
+  // ==========================================
+  // HANDLE IMAGE CHANGE
+  // ==========================================
+  const handleImageChange = (e) => {
+    setNewImage(e.target.files[0]);
+  };
+
+  // ==========================================
+  // UPDATE PRODUCT
+  // ==========================================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setSaving(true);
+
+    try {
+      const data = new FormData();
+
+      data.append("name", formData.name);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("oldPrice", formData.oldPrice);
+      data.append("category", formData.category);
+      data.append("brand", formData.brand);
+      data.append("gender", formData.gender);
+      data.append("featured", formData.featured);
+      data.append("discount", formData.discount);
+      data.append("rating", formData.rating);
+
+      // Only send image if user selected a new one
+      if (newImage) {
+        data.append("image", newImage);
+      }
+
+      const response = await fetch(
+        `${API_URL}/products/${id}`,
+        {
+          method: "PUT",
+          body: data,
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Product updated successfully!");
+
+        navigate("/admin");
+      } else {
+        alert(result.message || "Failed to update product");
+      }
+    } catch (error) {
+      console.error("Update product error:", error);
+      alert("Something went wrong while updating the product");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ==========================================
+  // LOADING
+  // ==========================================
+  if (loading) {
     return (
-        <>
-            {/* ================= HEADER ================= */}
-
-            <header className="fixed top-0 left-0 w-full h-[75px] bg-black z-50">
-
-                <div className="relative w-full h-full px-6 md:px-10 lg:px-12 flex items-center">
-
-                    {/* ================= LOGO ================= */}
-
-                    <div className="absolute left-6 md:left-10 lg:left-12">
-
-                        <Link to="/">
-
-                            <img
-                                src="/logo-white.png"
-                                alt="NAKASA"
-                                className="h-8 md:h-9 lg:h-10 w-auto object-contain"
-                            />
-
-                        </Link>
-
-                    </div>
-
-
-                    {/* ================= DESKTOP NAVIGATION ================= */}
-
-                    <nav className="
-                        hidden
-                        md:flex
-                        absolute
-                        left-1/2
-                        -translate-x-1/2
-                        items-center
-                        gap-8
-                        lg:gap-10
-                    ">
-
-                        <Link
-                            to="/women"
-                            className="
-                                text-white
-                                text-sm
-                                font-semibold
-                                tracking-wide
-                                hover:opacity-60
-                                transition
-                            "
-                        >
-                            WOMEN
-                        </Link>
-
-
-                        <Link
-                            to="/men"
-                            className="
-                                text-white
-                                text-sm
-                                font-semibold
-                                tracking-wide
-                                hover:opacity-60
-                                transition
-                            "
-                        >
-                            MEN
-                        </Link>
-
-
-                        <Link
-                            to="/products"
-                            className="
-                                text-white
-                                text-sm
-                                font-semibold
-                                tracking-wide
-                                hover:opacity-60
-                                transition
-                            "
-                        >
-                            SHOP ALL
-                        </Link>
-
-                    </nav>
-
-
-                    {/* ================= DESKTOP ICONS ================= */}
-
-                    <div className="
-                        hidden
-                        md:flex
-                        absolute
-                        right-6
-                        md:right-10
-                        lg:right-12
-                        items-center
-                        gap-5
-                    ">
-
-                        {/* Search */}
-
-                        <Link
-                            to="/search"
-                            className="text-white hover:opacity-60 transition"
-                        >
-                            <IoSearchOutline size={23} />
-                        </Link>
-
-
-                        {/* Account */}
-
-                        <Link
-                            to="/login"
-                            className="text-white hover:opacity-60 transition"
-                        >
-                            <IoPersonOutline size={22} />
-                        </Link>
-
-
-                        {/* Cart */}
-
-                        <Link
-                            to="/cart"
-                            className="relative text-white hover:opacity-60 transition"
-                        >
-                            <IoBagOutline size={23} />
-
-                            {cartCount > 0 && (
-                                <span className="
-                                    absolute
-                                    -top-2
-                                    -right-2
-                                    bg-red-500
-                                    text-white
-                                    text-xs
-                                    rounded-full
-                                    h-5
-                                    w-5
-                                    flex
-                                    items-center
-                                    justify-center
-                                ">
-                                    {cartCount}
-                                </span>
-                            )}
-
-                        </Link>
-
-                    </div>
-
-
-                    {/* ================= MOBILE ICONS ================= */}
-
-                    <div className="
-                        md:hidden
-                        ml-auto
-                        flex
-                        items-center
-                        gap-5
-                    ">
-
-                        {/* Search */}
-
-                        <Link
-                            to="/search"
-                            className="text-white"
-                        >
-                            <IoSearchOutline size={23} />
-                        </Link>
-
-
-                        {/* Cart */}
-
-                        <Link
-                            to="/cart"
-                            className="relative text-white"
-                        >
-                            <IoBagOutline size={23} />
-
-                            {cartCount > 0 && (
-                                <span className="
-                                    absolute
-                                    -right-2
-                                    -top-2
-                                    flex
-                                    h-4
-                                    min-w-4
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    bg-white
-                                    px-1
-                                    text-[10px]
-                                    font-bold
-                                    text-black
-                                ">
-                                    {cartCount}
-                                </span>
-                            )}
-
-                        </Link>
-
-
-                        {/* Menu */}
-
-                        <button
-                            onClick={() => setMenuOpen(!menuOpen)}
-                            className="text-white"
-                        >
-
-                            {menuOpen ? (
-                                <IoCloseOutline size={27} />
-                            ) : (
-                                <IoMenuOutline size={27} />
-                            )}
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </header>
-
-
-            {/* ================= MOBILE MENU ================= */}
-
-            <div
-                className={`
-                    fixed
-                    top-0
-                    right-0
-                    h-screen
-                    w-[280px]
-                    bg-white
-                    z-[60]
-                    transform
-                    transition-transform
-                    duration-300
-                    ${menuOpen
-                        ? "translate-x-0"
-                        : "translate-x-full"
-                    }
-                `}
-            >
-
-                {/* Mobile menu header */}
-
-                <div className="
-                    h-[90px]
-                    flex
-                    items-center
-                    justify-between
-                    px-6
-                    border-b
-                ">
-
-                    <span className="
-                        text-black
-                        font-semibold
-                        tracking-wider
-                    ">
-                        MENU
-                    </span>
-
-                    <button
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black"
-                    >
-                        <IoCloseOutline size={27} />
-                    </button>
-
-                </div>
-
-
-                {/* Mobile links */}
-
-                <nav className="
-                    flex
-                    flex-col
-                    px-6
-                    py-8
-                    gap-7
-                ">
-
-                    <Link
-                        to="/"
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black text-sm font-semibold tracking-wider"
-                    >
-                        HOME
-                    </Link>
-
-
-                    <Link
-                        to="/women"
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black text-sm font-semibold tracking-wider"
-                    >
-                        WOMEN
-                    </Link>
-
-
-                    <Link
-                        to="/men"
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black text-sm font-semibold tracking-wider"
-                    >
-                        MEN
-                    </Link>
-
-
-                    <Link
-                        to="/products"
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black text-sm font-semibold tracking-wider"
-                    >
-                        SHOP ALL
-                    </Link>
-
-
-                    <Link
-                        to="/contact"
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black text-sm font-semibold tracking-wider"
-                    >
-                        CONTACT US
-                    </Link>
-
-
-                    <Link
-                        to="/login"
-                        onClick={() => setMenuOpen(false)}
-                        className="text-black text-sm font-semibold tracking-wider"
-                    >
-                        MY ACCOUNT
-                    </Link>
-
-                </nav>
-
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl">Loading product...</p>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // PAGE
+  // ==========================================
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-3xl mx-auto">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Edit Product
+            </h1>
+
+            <p className="text-gray-500 mt-1">
+              Update NAKASA product details
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate("/admin")}
+            className="bg-gray-200 px-5 py-3 rounded hover:bg-gray-300"
+          >
+            Back
+          </button>
+        </div>
+
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-8 rounded-lg shadow space-y-6"
+        >
+
+          {/* NAME */}
+          <div>
+            <label className="block font-medium mb-2">
+              Product Name
+            </label>
+
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full border p-3 rounded"
+            />
+          </div>
+
+          {/* DESCRIPTION */}
+          <div>
+            <label className="block font-medium mb-2">
+              Description
+            </label>
+
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              rows="4"
+              className="w-full border p-3 rounded"
+            />
+          </div>
+
+          {/* PRICE */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div>
+              <label className="block font-medium mb-2">
+                Price
+              </label>
+
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                required
+                className="w-full border p-3 rounded"
+              />
             </div>
 
+            <div>
+              <label className="block font-medium mb-2">
+                Old Price
+              </label>
 
-            {/* ================= MOBILE OVERLAY ================= */}
+              <input
+                type="number"
+                name="oldPrice"
+                value={formData.oldPrice}
+                onChange={handleChange}
+                className="w-full border p-3 rounded"
+              />
+            </div>
 
-            {menuOpen && (
+          </div>
 
-                <div
-                    onClick={() => setMenuOpen(false)}
-                    className="
-                        fixed
-                        inset-0
-                        bg-black/40
-                        z-[55]
-                        md:hidden
-                    "
-                />
+          {/* CATEGORY + GENDER */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
+            <div>
+              <label className="block font-medium mb-2">
+                Category
+              </label>
+
+              <input
+                type="text"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+                className="w-full border p-3 rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-2">
+                Gender
+              </label>
+
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                required
+                className="w-full border p-3 rounded"
+              >
+                <option value="">Select Gender</option>
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Unisex">Unisex</option>
+              </select>
+            </div>
+
+          </div>
+
+          {/* BRAND */}
+          <div>
+            <label className="block font-medium mb-2">
+              Brand
+            </label>
+
+            <input
+              type="text"
+              name="brand"
+              value={formData.brand}
+              onChange={handleChange}
+              className="w-full border p-3 rounded"
+            />
+          </div>
+
+
+          {/* EXTRA PRODUCT SETTINGS */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+            <div>
+              <label className="block font-medium mb-2">
+                Discount %
+              </label>
+
+              <input
+                type="number"
+                name="discount"
+                value={formData.discount}
+                onChange={handleChange}
+                min="0"
+                max="100"
+                className="w-full border p-3 rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium mb-2">
+                Rating
+              </label>
+
+              <input
+                type="number"
+                name="rating"
+                value={formData.rating}
+                onChange={handleChange}
+                min="0"
+                max="5"
+                step="0.1"
+                className="w-full border p-3 rounded"
+              />
+            </div>
+
+          </div>
+
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg border p-4">
+            <input
+              type="checkbox"
+              name="featured"
+              checked={formData.featured}
+              onChange={handleChange}
+              className="h-4 w-4"
+            />
+
+            <span>
+              <span className="block font-medium">
+                Featured / Latest Arrival
+              </span>
+
+              <span className="text-sm text-gray-500">
+                Show this product in the latest-arrivals section.
+              </span>
+            </span>
+          </label>
+
+          {/* CURRENT IMAGE */}
+          <div>
+            <label className="block font-medium mb-3">
+              Current Image
+            </label>
+
+            {currentImage && (
+              <img
+                src={currentImage}
+                alt={formData.name}
+                className="w-40 h-40 object-cover rounded border"
+              />
             )}
+          </div>
 
-        </>
-    );
-}
+          {/* NEW IMAGE */}
+          <div>
+            <label className="block font-medium mb-2">
+              Change Image
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full border p-3 rounded"
+            />
+
+            <p className="text-sm text-gray-500 mt-2">
+              Leave this empty if you want to keep the current image.
+            </p>
+          </div>
+
+          {/* BUTTONS */}
+          <div className="flex gap-4 pt-4">
+
+            <button
+              type="button"
+              onClick={() => navigate("/admin")}
+              className="flex-1 bg-gray-200 py-3 rounded hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 bg-black text-white py-3 rounded hover:bg-gray-800 disabled:bg-gray-400"
+            >
+              {saving ? "Updating..." : "Update Product"}
+            </button>
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default EditProductPage;
