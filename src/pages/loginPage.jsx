@@ -42,52 +42,50 @@ export default function LoginPage() {
 
     // Form submit
     async function handleSubmit(e) {
-
         e.preventDefault();
-
         setError("");
 
         try {
-
             setLoading(true);
 
-            /*
-                Later we will connect this to our backend:
+            const API_URL =
+                import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-                const response = await api.post(
-                    "/users/login",
-                    formData
-                );
+            const response = await fetch(`${API_URL}/users/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: formData.email.trim().toLowerCase(),
+                    password: formData.password,
+                }),
+            });
 
-                const token = response.data.token;
+            const data = await response.json();
 
-                localStorage.setItem("token", token);
+            if (!response.ok) {
+                throw new Error(data.message || "Login failed");
+            }
 
+            if (!data.token) {
+                throw new Error("Login succeeded but no authentication token was returned");
+            }
+
+            localStorage.setItem("token", data.token);
+
+            if (data.isAdmin) {
+                navigate("/admin");
+            } else {
                 navigate("/");
-            */
-
-            console.log("Login data:", formData);
-            console.log("Remember me:", rememberMe);
-
-
-            // Temporary simulation
-            await new Promise(
-                resolve => setTimeout(resolve, 1000)
-            );
-
-            navigate("/");
-
+            }
         } catch (err) {
-
             setError(
-                err.response?.data?.message ||
+                err.message ||
                 "Login failed. Please check your email and password."
             );
-
         } finally {
-
             setLoading(false);
-
         }
     }
 

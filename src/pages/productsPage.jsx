@@ -1,6 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaHeart, FaSearch, FaShoppingBag } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { addToCart } from "../utils/cartUtils";
+import toast from "react-hot-toast";
+
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function ProductsPage() {
     const navigate = useNavigate();
@@ -10,120 +15,120 @@ export default function ProductsPage() {
     const [sort, setSort] = useState("default");
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    // Fetch products from backend
     useEffect(() => {
-        fetch("http://localhost:5000/api/products")
-            .then((response) => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                const response = await fetch(
+                    `${API_URL}/products?limit=100`
+                );
+
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error("Failed to fetch products");
+                    throw new Error(
+                        data.message || "Failed to fetch products"
+                    );
                 }
 
-                return response.json();
-            })
-            .then((data) => {
-                setProducts(data.products);
+                setProducts(data.products || []);
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                setError(err.message || "Failed to load products");
+            } finally {
                 setLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching products:", error);
-                setLoading(false);
-            });
+            }
+        };
+
+        fetchProducts();
     }, []);
 
-    // Filter products
-    let filteredProducts = products.filter((product) => {
-        const matchesSearch = product.name
-            ?.toLowerCase()
-            .includes(search.toLowerCase());
+    const filteredProducts = useMemo(() => {
+        const filtered = products.filter((product) => {
+            const productName = product.name?.toLowerCase() || "";
+            const productCategory = product.category?.toLowerCase() || "";
+            const productGender = product.gender?.toLowerCase() || "";
 
-        const matchesCategory =
-            category === "All" ||
-            product.category?.toLowerCase() === category.toLowerCase();
+            const matchesSearch = productName.includes(
+                search.toLowerCase()
+            );
 
-        return matchesSearch && matchesCategory;
-    });
+            let matchesCategory = true;
 
-    // Sort products
-    if (sort === "low") {
-        filteredProducts.sort(
-            (a, b) => Number(a.price) - Number(b.price)
-        );
-    }
+            if (category === "Women" || category === "Men") {
+                matchesCategory =
+                    productGender === category.toLowerCase();
+            } else if (category !== "All") {
+                matchesCategory =
+                    productCategory === category.toLowerCase();
+            }
 
-    if (sort === "high") {
-        filteredProducts.sort(
-            (a, b) => Number(b.price) - Number(a.price)
-        );
-    }
+            return matchesSearch && matchesCategory;
+        });
+
+        if (sort === "low") {
+            filtered.sort(
+                (a, b) => Number(a.price) - Number(b.price)
+            );
+        }
+
+        if (sort === "high") {
+            filtered.sort(
+                (a, b) => Number(b.price) - Number(a.price)
+            );
+        }
+
+        return filtered;
+    }, [products, search, category, sort]);
 
     return (
-        <div className="bg-white min-h-screen">
+        <div className="min-h-screen bg-white">
 
-            {/* Hero */}
             <section className="bg-[#f8f8f8] py-20 text-center">
-
-                <p className="text-sm tracking-[0.3em] text-gray-500 mb-4">
+                <p className="mb-4 text-sm tracking-[0.3em] text-gray-500">
                     NAKASA COLLECTION
                 </p>
 
-                <h1 className="text-4xl md:text-5xl font-bold tracking-wide">
+                <h1 className="text-4xl font-bold tracking-wide md:text-5xl">
                     SHOP ALL
                 </h1>
 
                 <p className="mt-5 text-gray-600">
                     Discover our latest styles and collections
                 </p>
-
             </section>
 
-            {/* Products Section */}
-            <section className="max-w-7xl mx-auto px-6 md:px-12 py-14">
+            <section className="mx-auto max-w-7xl px-6 py-14 md:px-12">
 
-                {/* Top Controls */}
-                <div className="flex flex-col lg:flex-row justify-between gap-5 mb-10">
-
-                    {/* Search */}
+                <div className="mb-10 flex flex-col justify-between gap-5 lg:flex-row">
                     <div className="relative w-full lg:w-96">
-
-                        <FaSearch
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                        />
+                        <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
 
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search products..."
-                            className="w-full border border-gray-300 rounded-full py-3 pl-11 pr-5 outline-none focus:border-[#e99b70]"
+                            className="w-full rounded-full border border-gray-300 py-3 pl-11 pr-5 outline-none focus:border-[#e99b70]"
                         />
-
                     </div>
 
-                    {/* Sort */}
                     <select
                         value={sort}
                         onChange={(e) => setSort(e.target.value)}
-                        className="border border-gray-300 rounded-full px-5 py-3 outline-none cursor-pointer"
+                        className="cursor-pointer rounded-full border border-gray-300 px-5 py-3 outline-none"
                     >
-                        <option value="default">
-                            Sort: Default
-                        </option>
-
-                        <option value="low">
-                            Price: Low to High
-                        </option>
-
-                        <option value="high">
-                            Price: High to Low
-                        </option>
+                        <option value="default">Sort: Default</option>
+                        <option value="low">Price: Low to High</option>
+                        <option value="high">Price: High to Low</option>
                     </select>
-
                 </div>
 
-                {/* Category Buttons */}
-                <div className="flex flex-wrap gap-3 mb-10">
-
+                <div className="mb-10 flex flex-wrap gap-3">
                     {[
                         "All",
                         "Women",
@@ -131,142 +136,116 @@ export default function ProductsPage() {
                         "Watches",
                         "Sunglasses",
                     ].map((item) => (
-
                         <button
                             key={item}
                             onClick={() => setCategory(item)}
-                            className={`px-6 py-2 rounded-full border transition duration-300 ${
+                            className={`rounded-full border px-6 py-2 transition ${
                                 category === item
-                                    ? "bg-black text-white border-black"
+                                    ? "border-black bg-black text-white"
                                     : "border-gray-300 hover:border-black"
                             }`}
                         >
                             {item}
                         </button>
-
                     ))}
-
                 </div>
 
-                {/* Product Count */}
-                <div className="flex justify-between items-center mb-7">
-
+                <div className="mb-7 flex items-center justify-between">
                     <p className="text-gray-500">
                         {filteredProducts.length} Products
                     </p>
-
                 </div>
 
-                {/* Loading */}
                 {loading ? (
-
-                    <div className="text-center py-20">
+                    <div className="py-20 text-center">
                         <h2 className="text-xl font-semibold">
                             Loading products...
                         </h2>
                     </div>
-
+                ) : error ? (
+                    <div className="py-20 text-center">
+                        <h2 className="text-xl font-semibold">
+                            Unable to load products
+                        </h2>
+                        <p className="mt-3 text-gray-500">{error}</p>
+                    </div>
                 ) : filteredProducts.length > 0 ? (
-
-                    /* Product Grid */
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-7">
-
+                    <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
                         {filteredProducts.map((product) => (
+                            <div key={product._id} className="group">
+                                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f5f5f5]">
 
-                            <div
-                                key={product._id}
-                                className="group"
-                            >
-
-                                {/* Product Image */}
-                                <div className="relative bg-[#f5f5f5] aspect-[3/4] overflow-hidden rounded-xl">
-
-                                    <Link
-                                        to={`/product/${product._id}`}
-                                    >
+                                    <Link to={`/product/${product._id}`}>
                                         <img
                                             src={product.image}
                                             alt={product.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                         />
                                     </Link>
 
-                                    {/* Wishlist */}
                                     <button
                                         type="button"
-                                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm hover:bg-[#ffc29d] transition"
+                                        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm transition hover:bg-[#ffc29d]"
+                                        aria-label={`Add ${product.name} to wishlist`}
                                     >
                                         <FaHeart size={15} />
                                     </button>
 
-                                    {/* Quick Add */}
                                     <button
                                         type="button"
-                                        className="absolute bottom-4 left-4 right-4 bg-white py-3 rounded-full font-medium opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition duration-300 flex items-center justify-center gap-2"
+                                        onClick={() => {
+                                            addToCart(product);
+                                            toast.success("Added to cart");
+                                        }}
+                                        className="absolute bottom-4 left-4 right-4 flex translate-y-3 items-center justify-center gap-2 rounded-full bg-white py-3 font-medium opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100"
                                     >
                                         <FaShoppingBag />
                                         Add to Cart
                                     </button>
-
                                 </div>
 
-                                {/* Product Information */}
                                 <div className="pt-4">
-
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">
+                                    <p className="text-xs uppercase tracking-wide text-gray-500">
                                         {product.category}
                                     </p>
 
-                                    <Link
-                                        to={`/product/${product._id}`}
-                                    >
-                                        <h3 className="font-medium mt-1 hover:text-[#e99b70] transition">
+                                    <Link to={`/product/${product._id}`}>
+                                        <h3 className="mt-1 font-medium hover:text-[#e99b70]">
                                             {product.name}
                                         </h3>
                                     </Link>
 
-                                    <p className="font-semibold mt-2">
-                                        Rs. {Number(product.price).toLocaleString()}
+                                    <p className="mt-2 font-semibold">
+                                        Rs.{" "}
+                                        {Number(product.price).toLocaleString()}
                                     </p>
 
-                                    {/* View Product */}
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            navigate(`/product/${product._id}`)
+                                            navigate(
+                                                `/product/${product._id}`
+                                            )
                                         }
-                                        className="mt-3 text-sm font-medium hover:text-[#e99b70] transition"
+                                        className="mt-3 text-sm font-medium hover:text-[#e99b70]"
                                     >
                                         View Product →
                                     </button>
-
                                 </div>
-
                             </div>
-
                         ))}
-
                     </div>
-
                 ) : (
-
-                    /* No Products */
-                    <div className="text-center py-20">
-
+                    <div className="py-20 text-center">
                         <h2 className="text-2xl font-semibold">
                             No products found
                         </h2>
-
-                        <p className="text-gray-500 mt-3">
+                        <p className="mt-3 text-gray-500">
                             Try another search or category.
                         </p>
-
                     </div>
-
                 )}
-
             </section>
-
         </div>
     );
 }
