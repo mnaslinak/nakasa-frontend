@@ -25,6 +25,9 @@ const AddProductPage = () => {
   const [preview, setPreview] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -34,6 +37,9 @@ const AddProductPage = () => {
     }));
   };
 
+  // =========================
+  // HANDLE IMAGE CHANGE
+  // =========================
   const handleImageChange = (e) => {
     const file = e.target.files?.[0] || null;
 
@@ -46,6 +52,9 @@ const AddProductPage = () => {
     }
   };
 
+  // =========================
+  // ADD PRODUCT
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,37 +63,63 @@ const AddProductPage = () => {
       return;
     }
 
+    const token = localStorage.getItem("token");
+
+    // Check whether admin token exists
+    if (!token) {
+      alert("Authentication required. Please login again.");
+      navigate("/login");
+      return;
+    }
+
     setSaving(true);
 
     try {
       const data = new FormData();
 
+      // Add all form values
       Object.entries(formData).forEach(([key, value]) => {
         data.append(key, value);
       });
 
+      // Add product image
       data.append("image", image);
+
+      console.log("Admin token:", token);
 
       const response = await fetch(`${API_URL}/products`, {
         method: "POST",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+
         body: data,
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to add product");
+        throw new Error(
+          result.message || "Failed to add product"
+        );
       }
 
       alert("Product added successfully!");
 
+      // Reset form
       setFormData(initialForm);
       setImage(null);
       setPreview("");
+
+      // Go back to admin dashboard
       navigate("/admin");
     } catch (error) {
       console.error("Add product error:", error);
-      alert(error.message || "Something went wrong");
+
+      alert(
+        error.message || "Something went wrong while adding product"
+      );
     } finally {
       setSaving(false);
     }
@@ -93,9 +128,15 @@ const AddProductPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-8 md:px-8">
       <div className="mx-auto max-w-3xl">
+
+        {/* ================= HEADER ================= */}
+
         <div className="mb-8 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Add Product</h1>
+            <h1 className="text-3xl font-bold">
+              Add Product
+            </h1>
+
             <p className="mt-1 text-gray-500">
               Add a new product to the NAKASA store.
             </p>
@@ -110,12 +151,20 @@ const AddProductPage = () => {
           </button>
         </div>
 
+        {/* ================= FORM ================= */}
+
         <form
           onSubmit={handleSubmit}
           className="space-y-6 rounded-xl bg-white p-6 shadow-sm md:p-8"
         >
+
+          {/* PRODUCT NAME */}
+
           <div>
-            <label className="mb-2 block font-medium">Product Name</label>
+            <label className="mb-2 block font-medium">
+              Product Name
+            </label>
+
             <input
               name="name"
               value={formData.name}
@@ -126,8 +175,13 @@ const AddProductPage = () => {
             />
           </div>
 
+          {/* DESCRIPTION */}
+
           <div>
-            <label className="mb-2 block font-medium">Description</label>
+            <label className="mb-2 block font-medium">
+              Description
+            </label>
+
             <textarea
               name="description"
               value={formData.description}
@@ -139,9 +193,15 @@ const AddProductPage = () => {
             />
           </div>
 
+          {/* PRICE */}
+
           <div className="grid gap-5 md:grid-cols-2">
+
             <div>
-              <label className="mb-2 block font-medium">Price</label>
+              <label className="mb-2 block font-medium">
+                Price
+              </label>
+
               <input
                 type="number"
                 name="price"
@@ -155,7 +215,10 @@ const AddProductPage = () => {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium">Old Price</label>
+              <label className="mb-2 block font-medium">
+                Old Price
+              </label>
+
               <input
                 type="number"
                 name="oldPrice"
@@ -167,11 +230,18 @@ const AddProductPage = () => {
                 placeholder="Optional"
               />
             </div>
+
           </div>
 
+          {/* CATEGORY & GENDER */}
+
           <div className="grid gap-5 md:grid-cols-2">
+
             <div>
-              <label className="mb-2 block font-medium">Category</label>
+              <label className="mb-2 block font-medium">
+                Category
+              </label>
+
               <select
                 name="category"
                 value={formData.category}
@@ -179,14 +249,25 @@ const AddProductPage = () => {
                 required
                 className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-black"
               >
-                <option value="">Select Category</option>
-                <option value="Sunglasses">Sunglasses</option>
-                <option value="Watches">Watches</option>
+                <option value="">
+                  Select Category
+                </option>
+
+                <option value="Sunglasses">
+                  Sunglasses
+                </option>
+
+                <option value="Watches">
+                  Watches
+                </option>
               </select>
             </div>
 
             <div>
-              <label className="mb-2 block font-medium">Gender</label>
+              <label className="mb-2 block font-medium">
+                Gender
+              </label>
+
               <select
                 name="gender"
                 value={formData.gender}
@@ -194,17 +275,35 @@ const AddProductPage = () => {
                 required
                 className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-black"
               >
-                <option value="">Select Gender</option>
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
-                <option value="Unisex">Unisex</option>
+                <option value="">
+                  Select Gender
+                </option>
+
+                <option value="Men">
+                  Men
+                </option>
+
+                <option value="Women">
+                  Women
+                </option>
+
+                <option value="Unisex">
+                  Unisex
+                </option>
               </select>
             </div>
+
           </div>
 
+          {/* BRAND / DISCOUNT / RATING */}
+
           <div className="grid gap-5 md:grid-cols-3">
+
             <div>
-              <label className="mb-2 block font-medium">Brand</label>
+              <label className="mb-2 block font-medium">
+                Brand
+              </label>
+
               <input
                 name="brand"
                 value={formData.brand}
@@ -214,7 +313,10 @@ const AddProductPage = () => {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium">Discount %</label>
+              <label className="mb-2 block font-medium">
+                Discount %
+              </label>
+
               <input
                 type="number"
                 name="discount"
@@ -228,7 +330,10 @@ const AddProductPage = () => {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium">Rating</label>
+              <label className="mb-2 block font-medium">
+                Rating
+              </label>
+
               <input
                 type="number"
                 name="rating"
@@ -241,9 +346,13 @@ const AddProductPage = () => {
                 placeholder="0 - 5"
               />
             </div>
+
           </div>
 
+          {/* FEATURED PRODUCT */}
+
           <label className="flex cursor-pointer items-center gap-3 rounded-lg border p-4">
+
             <input
               type="checkbox"
               name="featured"
@@ -251,16 +360,25 @@ const AddProductPage = () => {
               onChange={handleChange}
               className="h-4 w-4"
             />
+
             <span>
-              <span className="block font-medium">Featured / Latest Arrival</span>
+              <span className="block font-medium">
+                Featured / Latest Arrival
+              </span>
+
               <span className="text-sm text-gray-500">
                 Show this product in the latest-arrivals section.
               </span>
             </span>
+
           </label>
 
+          {/* PRODUCT IMAGE */}
+
           <div>
-            <label className="mb-2 block font-medium">Product Image</label>
+            <label className="mb-2 block font-medium">
+              Product Image
+            </label>
 
             <input
               type="file"
@@ -277,9 +395,13 @@ const AddProductPage = () => {
                 className="mt-4 h-48 w-48 rounded-lg border object-cover"
               />
             )}
+
           </div>
 
+          {/* BUTTONS */}
+
           <div className="flex gap-4 pt-2">
+
             <button
               type="button"
               onClick={() => navigate("/admin")}
@@ -293,9 +415,13 @@ const AddProductPage = () => {
               disabled={saving}
               className="flex-1 rounded-lg bg-black py-3 font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
             >
-              {saving ? "Adding Product..." : "Add Product"}
+              {saving
+                ? "Adding Product..."
+                : "Add Product"}
             </button>
+
           </div>
+
         </form>
       </div>
     </div>
