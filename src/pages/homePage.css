@@ -1,0 +1,1179 @@
+/* ========================================
+   NAKASA HERO
+======================================== */
+
+.nakasa-hero {
+    position: relative;
+    isolation: isolate;
+
+    width: 100%;
+
+    min-height: 720px;
+    height: 100svh;
+    max-height: 1100px;
+
+    overflow: hidden;
+
+    background: #111;
+    color: #fff;
+}
+
+.nakasa-hero * {
+    box-sizing: border-box;
+}
+
+
+/* ========================================
+   HERO BACKGROUND SCENES
+======================================== */
+
+.nakasa-scene {
+    position: absolute;
+    inset: 0;
+
+    opacity: 0;
+
+    transition: opacity 1000ms ease;
+
+    pointer-events: none;
+}
+
+.nakasa-scene.is-active {
+    opacity: 1;
+}
+
+.nakasa-scene img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.nakasa-scene.is-active img {
+    animation: nakasa-drift 5s linear both;
+}
+
+.nakasa-hero.is-paused .nakasa-scene img {
+    animation-play-state: paused;
+}
+
+
+/* ========================================
+   PRODUCT IMAGE SCENE
+======================================== */
+
+.nakasa-scene.is-product img {
+    object-fit: contain;
+
+    padding:
+        90px
+        4%
+        125px
+        42%;
+
+    background: #151515;
+}
+
+
+/* ========================================
+   DARK OVERLAY
+======================================== */
+
+.nakasa-shade {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(8, 8, 8, 0.93) 0%,
+            rgba(8, 8, 8, 0.68) 38%,
+            rgba(8, 8, 8, 0.12) 100%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(8, 8, 8, 0.88),
+            transparent 45%
+        );
+}
+
+
+/* ========================================
+   HERO CONTENT
+======================================== */
+
+.nakasa-hero-content {
+    position: absolute;
+
+    left: clamp(24px, 5vw, 80px);
+
+    top: 50%;
+
+    transform: translateY(-45%);
+
+    max-width: 720px;
+
+    right: 24px;
+
+    z-index: 2;
+}
+
+
+/* ========================================
+   EYEBROW
+======================================== */
+
+.nakasa-eyebrow {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 0 0 24px;
+
+    color: #ffc29d;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.25em;
+
+    text-transform: uppercase;
+}
+
+.nakasa-eyebrow::before {
+    content: "";
+
+    width: 36px;
+
+    height: 1px;
+
+    background: currentColor;
+}
+
+
+/* ========================================
+   MAIN HEADING
+
+   Reduced from the previous
+   maximum size of 116px
+======================================== */
+
+.nakasa-hero h1 {
+    margin: 0;
+
+    font-size: clamp(
+        42px,
+        5.2vw,
+        78px
+    );
+
+    font-weight: 900;
+
+    line-height: 0.98;
+
+    letter-spacing: -0.045em;
+}
+
+
+/* Second line */
+
+.nakasa-hero h1 span {
+    color: #ffc29d;
+}
+
+
+/* ========================================
+   HERO DESCRIPTION
+======================================== */
+
+.nakasa-hero-description {
+    max-width: 380px;
+
+    margin: 25px 0 0;
+
+    color: #ded8d3;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+
+/* ========================================
+   HERO BUTTON CONTAINER
+======================================== */
+
+.nakasa-hero-actions {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 30px;
+}
+
+
+/* ========================================
+   HERO BUTTONS
+======================================== */
+
+.nakasa-hero-actions a {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 52px;
+
+    padding: 15px 25px;
+
+    color: #ffc29d;
+
+    background: transparent;
+
+    border: 1px solid #ffc29d;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.2s ease;
+}
+
+
+/* Hover */
+
+.nakasa-hero-actions a:hover {
+    background: #ffc29d;
+
+    color: #19120e;
+
+    border-color: #ffc29d;
+
+    transform: translateY(-2px);
+}
+
+
+/* Click */
+
+.nakasa-hero-actions a:active {
+    background: #ffc29d;
+
+    color: #19120e;
+
+    border-color: #ffc29d;
+
+    transform: translateY(0);
+}
+
+
+/* Keyboard focus */
+
+.nakasa-hero-actions a:focus-visible {
+    background: #ffc29d;
+
+    color: #19120e;
+
+    border-color: #ffc29d;
+
+    outline: 3px solid #ffc29d;
+
+    outline-offset: 5px;
+}
+
+.nakasa-hero button:focus-visible {
+    outline: 3px solid #ffc29d;
+
+    outline-offset: 5px;
+}
+
+
+/* ========================================
+   SCENE CAPTION
+======================================== */
+
+.nakasa-scene-caption {
+    position: absolute;
+
+    right: clamp(24px, 5vw, 80px);
+
+    bottom: 125px;
+
+    text-align: right;
+
+    z-index: 2;
+}
+
+.nakasa-scene-caption p {
+    margin: 0 0 7px;
+
+    color: #ffc29d;
+
+    font-size: 10px;
+
+    letter-spacing: 0.2em;
+
+    text-transform: uppercase;
+}
+
+.nakasa-scene-caption h2 {
+    margin: 0;
+
+    font-size: clamp(
+        20px,
+        2.5vw,
+        32px
+    );
+
+    font-weight: 500;
+}
+
+.nakasa-scene-caption span {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #e2d9d3;
+
+    font-size: 13px;
+}
+
+
+/* ========================================
+   SLIDER CONTROLS
+======================================== */
+
+.nakasa-controls {
+    position: absolute;
+
+    left: clamp(24px, 5vw, 80px);
+
+    right: clamp(24px, 5vw, 80px);
+
+    bottom: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 24px;
+
+    padding-top: 16px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.25);
+
+    z-index: 3;
+}
+
+
+/* ========================================
+   SLIDER DOTS
+======================================== */
+
+.nakasa-dots {
+    display: flex;
+
+    flex: 1;
+
+    gap: 12px;
+
+    max-width: 420px;
+}
+
+.nakasa-dots button {
+    flex: 1;
+
+    min-width: 36px;
+
+    min-height: 44px;
+
+    padding: 8px 0;
+
+    background: none;
+
+    border: 0;
+
+    color: #ddd;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    font-size: 10px;
+}
+
+.nakasa-dots i {
+    display: block;
+
+    height: 2px;
+
+    margin-bottom: 8px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.3
+        );
+}
+
+
+/* Active slide */
+
+.nakasa-dots button[aria-pressed="true"] {
+    color: #ffc29d;
+}
+
+.nakasa-dots
+button[aria-pressed="true"]
+i {
+    background: #ffc29d;
+}
+
+
+/* ========================================
+   PAUSE BUTTON
+======================================== */
+
+.nakasa-pause {
+    margin-left: auto;
+
+    min-height: 44px;
+
+    min-width: 92px;
+
+    padding: 10px 14px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.5);
+
+    background:
+        rgba(0, 0, 0, 0.25);
+
+    color: #fff;
+
+    cursor: pointer;
+
+    font-size: 12px;
+}
+
+.nakasa-pause:hover {
+    border-color: #ffc29d;
+
+    color: #ffc29d;
+}
+
+
+/* ========================================
+   MOTION NOTE
+======================================== */
+
+.nakasa-motion-note {
+    margin-left: auto;
+
+    color: #ddd;
+
+    font-size: 12px;
+}
+
+
+/* ========================================
+   HERO BACKGROUND ANIMATION
+======================================== */
+
+@keyframes nakasa-drift {
+
+    from {
+        transform:
+            scale(1.02)
+            translateX(0);
+    }
+
+    to {
+        transform:
+            scale(1.085)
+            translateX(-0.5%);
+    }
+}
+
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 900px) {
+
+    .nakasa-hero h1 {
+        font-size: clamp(
+            42px,
+            7vw,
+            66px
+        );
+    }
+
+    .nakasa-scene-caption {
+        bottom: 120px;
+    }
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 640px) {
+
+    .nakasa-hero {
+        min-height: 720px;
+
+        max-height: 950px;
+    }
+
+
+    /* Main content */
+
+    .nakasa-hero-content {
+        top: 42%;
+
+        transform:
+            translateY(-35%);
+
+        right: 20px;
+    }
+
+
+    /* Heading */
+
+    .nakasa-hero h1 {
+        font-size: clamp(
+            36px,
+            10vw,
+            52px
+        );
+
+        line-height: 1;
+
+        letter-spacing: -0.035em;
+    }
+
+
+    /* Eyebrow */
+
+    .nakasa-eyebrow {
+        margin-bottom: 18px;
+
+        font-size: 9px;
+
+        letter-spacing: 0.18em;
+    }
+
+
+    /* Description */
+
+    .nakasa-hero-description {
+        max-width: 290px;
+
+        margin-top: 20px;
+
+        font-size: 14px;
+    }
+
+
+    /* Buttons */
+
+    .nakasa-hero-actions {
+        gap: 8px;
+
+        margin-top: 24px;
+    }
+
+    .nakasa-hero-actions a {
+        min-height: 46px;
+
+        padding: 13px 16px;
+
+        font-size: 11px;
+    }
+
+
+    /* Scene caption */
+
+    .nakasa-scene-caption {
+        left: 24px;
+
+        right: auto;
+
+        bottom: 130px;
+
+        text-align: left;
+    }
+
+    .nakasa-scene-caption h2 {
+        font-size: 21px;
+    }
+
+    .nakasa-scene-caption span {
+        display: none;
+    }
+
+
+    /* Product images */
+
+    .nakasa-scene.is-product img {
+        padding:
+            85px
+            10px
+            260px;
+    }
+
+
+    /* Mobile overlay */
+
+    .nakasa-shade {
+        background:
+            linear-gradient(
+                90deg,
+                rgba(8, 8, 8, 0.75),
+                rgba(8, 8, 8, 0.3)
+            ),
+            linear-gradient(
+                0deg,
+                #080808,
+                transparent 95%
+            );
+    }
+
+
+    /* Slider */
+
+    .nakasa-controls {
+        gap: 15px;
+    }
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 400px) {
+
+    .nakasa-hero h1 {
+        font-size: 35px;
+    }
+
+    .nakasa-hero-actions a {
+        padding: 11px 13px;
+
+        font-size: 10px;
+    }
+
+    .nakasa-pause {
+        min-width: 72px;
+
+        font-size: 10px;
+    }
+}
+
+
+/* ========================================
+   REDUCED MOTION
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .nakasa-hero .nakasa-scene,
+    .nakasa-hero .nakasa-scene img,
+    .nakasa-hero a {
+        animation: none !important;
+
+        transition: none !important;
+    }
+}
+/* ========================================
+   LATEST ARRIVALS
+======================================== */
+
+.nakasa-latest-section {
+    width: 100%;
+
+    padding: 80px 0;
+
+    background: #ffffff;
+
+    overflow: hidden;
+}
+
+
+/* ========================================
+   LATEST HEADER
+======================================== */
+
+.nakasa-latest-header {
+    width: 100%;
+
+    max-width: 1400px;
+
+    margin: 0 auto 40px;
+
+    padding: 0 48px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
+
+    gap: 20px;
+}
+
+
+.nakasa-latest-eyebrow {
+    margin: 0 0 8px;
+
+    color: #888;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.22em;
+
+    text-transform: uppercase;
+}
+
+
+.nakasa-latest-header h2 {
+    margin: 0;
+
+    color: #111;
+
+    font-size: clamp(
+        30px,
+        4vw,
+        48px
+    );
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.03em;
+}
+
+
+/* VIEW ALL */
+
+.nakasa-view-all {
+    color: #111;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.1em;
+
+    text-decoration: none;
+
+    transition:
+        opacity 0.2s ease;
+}
+
+
+.nakasa-view-all:hover {
+    opacity: 0.6;
+}
+
+
+/* ========================================
+   SLIDER AREA
+======================================== */
+
+.nakasa-latest-slider {
+    width: 100%;
+
+    overflow: hidden;
+
+    padding:
+        5px
+        0
+        20px;
+}
+
+
+/* ========================================
+   MOVING TRACK
+======================================== */
+
+.nakasa-latest-track {
+    display: flex;
+
+    align-items: flex-start;
+
+    width: max-content;
+
+    gap: 24px;
+
+    padding-left: 24px;
+
+    animation:
+        nakasa-latest-scroll
+        55s
+        linear
+        infinite;
+
+    will-change: transform;
+}
+
+
+/* ========================================
+   HOVER = PAUSE
+======================================== */
+
+.nakasa-latest-slider:hover
+.nakasa-latest-track {
+    animation-play-state: paused;
+}
+
+
+/* ========================================
+   PRODUCT CARD
+======================================== */
+
+.nakasa-latest-card {
+    width: 280px;
+
+    flex: 0 0 280px;
+
+    color: #111;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+
+/* ========================================
+   PRODUCT IMAGE
+======================================== */
+
+.nakasa-latest-image {
+    position: relative;
+
+    width: 100%;
+
+    height: 350px;
+
+    overflow: hidden;
+
+    background: #f4f4f4;
+}
+
+
+.nakasa-latest-image img {
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform
+        0.5s
+        ease;
+}
+
+
+/* IMAGE HOVER */
+
+.nakasa-latest-card:hover
+.nakasa-latest-image img {
+    transform: scale(1.04);
+}
+
+
+/* ========================================
+   DISCOUNT BADGE
+======================================== */
+
+.nakasa-discount {
+    position: absolute;
+
+    top: 14px;
+
+    left: 14px;
+
+    padding:
+        7px
+        10px;
+
+    background: #111;
+
+    color: #fff;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.05em;
+}
+
+
+/* ========================================
+   PRODUCT DETAILS
+======================================== */
+
+.nakasa-latest-info {
+    padding-top: 16px;
+}
+
+
+.nakasa-product-category {
+    margin:
+        0
+        0
+        6px;
+
+    color: #888;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.15em;
+
+    text-transform: uppercase;
+}
+
+
+.nakasa-latest-info h3 {
+    margin: 0;
+
+    color: #111;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+
+/* ========================================
+   PRODUCT PRICE
+======================================== */
+
+.nakasa-price {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 9px;
+}
+
+
+.nakasa-price span {
+    color: #111;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.nakasa-price del {
+    color: #999;
+
+    font-size: 12px;
+
+    font-weight: 400;
+}
+
+
+/* ========================================
+   RIGHT → LEFT ANIMATION
+======================================== */
+
+@keyframes nakasa-latest-scroll {
+
+    from {
+        transform:
+            translateX(0);
+    }
+
+    to {
+        transform:
+            translateX(
+                calc(
+                    -50% - 12px
+                )
+            );
+    }
+}
+
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 900px) {
+
+    .nakasa-latest-section {
+        padding:
+            65px
+            0;
+    }
+
+
+    .nakasa-latest-header {
+        padding:
+            0
+            24px;
+
+        margin-bottom:
+            32px;
+    }
+
+
+    .nakasa-latest-card {
+        width: 240px;
+
+        flex-basis:
+            240px;
+    }
+
+
+    .nakasa-latest-image {
+        height: 300px;
+    }
+
+
+    .nakasa-latest-track {
+        gap: 20px;
+
+        padding-left:
+            20px;
+    }
+
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 640px) {
+
+    .nakasa-latest-section {
+        padding:
+            55px
+            0;
+    }
+
+
+    .nakasa-latest-header {
+        padding:
+            0
+            18px;
+
+        margin-bottom:
+            28px;
+
+        gap: 12px;
+    }
+
+
+    .nakasa-latest-header h2 {
+        font-size:
+            27px;
+    }
+
+
+    .nakasa-latest-eyebrow {
+        font-size:
+            9px;
+    }
+
+
+    .nakasa-view-all {
+        font-size:
+            10px;
+    }
+
+
+    .nakasa-latest-card {
+        width: 210px;
+
+        flex-basis:
+            210px;
+    }
+
+
+    .nakasa-latest-image {
+        height: 260px;
+    }
+
+
+    .nakasa-latest-track {
+        gap: 16px;
+
+        padding-left:
+            16px;
+
+        animation-duration:
+            45s;
+    }
+
+
+    .nakasa-latest-info h3 {
+        font-size:
+            14px;
+    }
+
+}
+
+
+/* ========================================
+   REDUCED MOTION
+======================================== */
+
+@media (
+    prefers-reduced-motion:
+    reduce
+) {
+
+    .nakasa-latest-track {
+        animation: none;
+    }
+
+
+    .nakasa-latest-image img {
+        transition: none;
+    }
+
+}
